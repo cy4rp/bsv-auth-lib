@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BSV Auth Demo — @cy4rp/bsv-auth-lib</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="2"/>
+          <text x="16" y="21" text-anchor="middle" font-size="14" font-weight="bold" fill="currentColor">B</text>
+        </svg>
+        <h1>BSV Auth Demo</h1>
+      </div>
+      <p class="subtitle">@cy4rp/bsv-auth-lib — WIF & MetaMask sign-to-derive</p>
+    </header>
+
+    <main>
+      <!-- Network Selector -->
+      <div class="network-bar">
+        <span class="network-label">Network:</span>
+        <button id="btn-testnet" class="network-btn active">Testnet</button>
+        <button id="btn-mainnet" class="network-btn">Mainnet</button>
+      </div>
+
+      <!-- Auth Methods -->
+      <div class="auth-grid">
+        <!-- WIF Login Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon wif-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="m7 11 0-4a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h2>WIF 秘密鍵ログイン</h2>
+          </div>
+          <p class="card-desc">BSV WIF (Wallet Import Format) 秘密鍵を入力して認証</p>
+          <div class="input-group">
+            <label for="wif-input">WIF Private Key</label>
+            <input id="wif-input" type="password" placeholder="cNxZ... (testnet) or KwDi... (mainnet)" spellcheck="false" autocomplete="off" />
+            <button id="wif-toggle-vis" class="toggle-vis" title="表示/非表示">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button id="btn-wif-login" class="btn btn-primary">WIF でログイン</button>
+          <button id="btn-wif-generate" class="btn btn-secondary">テスト鍵を生成</button>
+        </div>
+
+        <!-- MetaMask Login Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon mm-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M21.3 2L13 8.2l1.5-3.6L21.3 2z" fill="#E2761B" stroke="#E2761B" stroke-width=".2"/>
+                <path d="M2.7 2l8.2 6.3-1.4-3.5L2.7 2z" fill="#E4761B" stroke="#E4761B" stroke-width=".2"/>
+                <path d="M18.4 17.2l-2.2 3.4 4.7 1.3 1.4-4.6-3.9-.1zM1.7 17.3l1.3 4.6 4.7-1.3-2.2-3.4-3.8.1z" fill="#E4761B" stroke="#E4761B" stroke-width=".2"/>
+                <path d="M7.5 10.5L6.2 12.4l4.7.2-.2-5-3.2 2.9zM16.5 10.5l-3.2-3 -.1 5.1 4.7-.2-1.4-1.9z" fill="#E4761B" stroke="#E4761B" stroke-width=".2"/>
+              </svg>
+            </div>
+            <h2>MetaMask ログイン</h2>
+          </div>
+          <p class="card-desc">MetaMask 署名から BSV 鍵を導出（ネットワーク切替不要）</p>
+          <div class="metamask-info">
+            <div class="info-row">
+              <span class="info-label">仕組み</span>
+              <span class="info-value">personal_sign → SHA-256 → BSV 鍵</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ETH 秘密鍵</span>
+              <span class="info-value safe">MetaMask 内に安全に保持</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">ネットワーク</span>
+              <span class="info-value">変更不要（ETH Mainnet のまま）</span>
+            </div>
+          </div>
+          <button id="btn-mm-login" class="btn btn-metamask">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21.3 2L13 8.2l1.5-3.6L21.3 2z" fill="#fff" stroke="#fff" stroke-width=".2"/><path d="M2.7 2l8.2 6.3-1.4-3.5L2.7 2z" fill="#fff" stroke="#fff" stroke-width=".2"/></svg>
+            MetaMask で接続
+          </button>
+          <div id="mm-status" class="status-line hidden"></div>
+        </div>
+      </div>
+
+      <!-- Result Panel -->
+      <div id="result-panel" class="result-panel hidden">
+        <div class="result-header">
+          <h2>認証結果</h2>
+          <div class="result-badges">
+            <span id="badge-method" class="badge"></span>
+            <span id="badge-network" class="badge badge-network"></span>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-item">
+            <label>BSV Address</label>
+            <code id="res-address"></code>
+          </div>
+          <div class="result-item">
+            <label>Public Key</label>
+            <code id="res-pubkey"></code>
+          </div>
+          <div class="result-item" id="res-eth-row">
+            <label>ETH Address (署名元)</label>
+            <code id="res-eth"></code>
+          </div>
+          <div class="result-item">
+            <label>認証時刻</label>
+            <code id="res-time"></code>
+          </div>
+        </div>
+
+        <!-- Challenge-Response Demo -->
+        <div class="challenge-section">
+          <h3>チャレンジ・レスポンス認証</h3>
+          <p>サーバーサイド検証のデモ: ランダムチャレンジに署名し、公開鍵で検証します。</p>
+          <button id="btn-prove" class="btn btn-primary">署名して検証</button>
+          <div id="proof-result" class="proof-result hidden">
+            <div class="proof-item">
+              <label>Challenge</label>
+              <code id="proof-challenge"></code>
+            </div>
+            <div class="proof-item">
+              <label>Signature</label>
+              <code id="proof-sig"></code>
+            </div>
+            <div class="proof-item">
+              <label>検証結果</label>
+              <div id="proof-verify" class="verify-result"></div>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-logout" class="btn btn-secondary">ログアウト</button>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        <a href="https://github.com/cy4rp/bsv-auth-lib" target="_blank">GitHub</a>
+        · Powered by <code>@noble/secp256k1</code> + <code>@noble/hashes</code>
+        · BSV Testnet
+      </p>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
