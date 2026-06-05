@@ -1,0 +1,56 @@
+{
+  "name": "@cy4rp/bsv-auth-lib",
+  "version": "0.1.0",
+  "description": "BSV testnet authentication library — WIF private key & MetaMask sign-to-derive. No network switch required.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/ --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "bsv",
+    "bitcoin-sv",
+    "metamask",
+    "authentication",
+    "sign-to-derive",
+    "wif",
+    "secp256k1",
+    "testnet"
+  ],
+  "author": "cy4rp",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cy4rp/bsv-auth-lib.git"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.0",
+    "@noble/secp256k1": "^2.2.0",
+    "bs58check": "^4.0.0"
+  }
+}
